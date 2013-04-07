@@ -1,0 +1,83 @@
+## couple of available navigation helpers
+#set ($modifierKey = $action.browserUtils.getModifierKey())
+#set ($submitAccessKey = $i18n.getText('AUI.form.submit.button.accesskey'))
+#set ($submitTitle = $i18n.getText('AUI.form.submit.button.tooltip', [$submitAccessKey, $modifierKey]))
+#set ($cancelAccessKey = $i18n.getText('AUI.form.cancel.link.accesskey'))
+#set ($cancelTitle = $i18n.getText('AUI.form.cancel.link.tooltip', [$cancelAccessKey, $modifierKey]))
+<html>
+<head>
+    <title>$action.handlerName</title>
+</head>
+<body>
+<form class="aui" action="EditCreateOrCommentHandlerDetails.jspa" method="POST" name="mailHandlerForm" id="mailHandlerForm">
+    <div class="form-body">
+        <h2>$action.handlerName</h2>
+        <span class="global-errors-location">
+            #if ($action.getHasErrorMessages())
+                    #foreach ($error in $action.getFlushedErrorMessages())
+                #AUImessage("error" "" $textutils.htmlEncode(${error}) "" "" "" "false")
+            #end
+                #end
+        </span>
+        <input type="hidden" name="atl_token" value="$atl_token"/>
+
+        <label for="project-key">$i18n.getText('createhandler.project.key')</label>
+        <select name="selectedProject" id=project-key">
+        #foreach($project in $projects)
+            #if($project == $selectedProject)
+                <option value="${project.id}" selected>[$project.id] ${project.key}</option>
+            #else
+                <option value="${project.id}">[$project.id] ${project.key}</option>
+            #end
+        #end
+        </select>
+
+        <label for="issue-type">$i18n.getText('createhandler.issueype')</label>
+        <select name="selectedIssueType" id=issue-type">
+        #foreach($issueType in $issueTypes)
+            #if($issueType== $selectedIssueType)
+                <option value="${issueType.id}" selected>[$issueType.id] ${issueType.name}</option>
+            #else
+                <option value="${issueType.id}">[$issueType.id] ${issueType.name}</option>
+            #end
+        #end
+        </select>
+
+        <label for="stripQuotes">$i18n.getText('createhandler.strip-quotes')</label>
+    #if ($createUsers == true)
+        <input type="checkbox" name="stripQuotes" id="stripQuotes" value="" checked>
+    #else
+        <input type="checkbox" name="stripQuotes" id="stripQuotes" value="">
+    #end
+
+        <label for="jiraEmail">$i18n.getText('createhandler.jira-email')</label>
+        <input type="text" class="text" id="jiraEmail" name="jiraEmail" value="$!textutils.htmlEncode($jiraEmail)">
+
+        <label for="reporter">$i18n.getText('createhandler.reporter')</label>
+        <input type="text" class="text" id="reporter" name="reporter" value="$!textutils.htmlEncode($reporter)">
+
+        <label for="customField">$i18n.getText('createhandler.customfield')</label>
+        <input type="text" class="text" id="customfield" name="customfield" value="$!textutils.htmlEncode($customfield)">
+
+        <label for="alias">$i18n.getText('createhandler.alias')</label>
+        <input type="text" class="text" id="alias" name="alias" value="$!textutils.htmlEncode($alias)">
+
+        <label for="whitelist">$i18n.getText('createhandler.whitelist')</label>
+        <input type="text" class="text" id="whitelist" name="whitelist" value="$!textutils.htmlEncode($whitelist)">
+
+        <div class="buttons-container form-footer">
+            <div class="buttons">
+                #if ($action.editing)
+                    #set ($addButtonLabel = $i18n.getText('common.words.save'))
+                #else
+                    #set ($addButtonLabel = $i18n.getText('common.forms.add'))
+                #end
+                <input id="addButton" type="submit" class="button" value="$!addButtonLabel" accesskey="$submitAccessKey" title="$submitTitle">
+                <a href="IncomingMailServers.jspa" class="cancel" accesskey="$cancelAccessKey" title="$cancelTitle">$i18n.getText("AUI.form.cancel.link.text")</a>
+            </div>
+
+        </div>
+    </div>
+</form>
+</body>
+</html>

@@ -1,0 +1,53 @@
+<atlassian-plugin key="com.ideotechnologies.jira.jira-custom-advanced-email-handler" name="Advanced Email Handler for JIRA by Ideo Technologies" plugins-version="2">
+    <plugin-info>
+        <description>This is the advanced email handler plugin for Atlassian JIRA by Ideo Technologies.</description>
+        <version>1.0-SNAPSHOT</version>
+        <vendor name="Ideo Technologies" url="http://www.ideotechnologies.com/" />
+        <param name="plugin-icon">images/pluginIcon.png</param>
+        <param name="plugin-logo">images/pluginLogo.png</param>
+    </plugin-info>
+
+    <!-- add our i18n resource -->
+    <resource type="i18n" name="i18n" location="com.ideotechnologies.jira.handler.messages"/>
+
+    <!-- add our web resources -->
+    <web-resource key="jira-custom-advanced-email-handler-resources" name="jira-custom-advanced-email-handler Web Resources">
+        <dependency>com.atlassian.auiplugin:ajs</dependency>
+
+        <resource type="download" name="jira-custom-advanced-email-handler.css" location="/css/jira-custom-advanced-email-handler.css"/>
+        <resource type="download" name="jira-custom-advanced-email-handler.js" location="/js/jira-custom-advanced-email-handler.js"/>
+        <resource type="download" name="images/" location="/images"/>
+
+        <context>jira-custom-advanced-email-handler</context>
+    </web-resource>
+
+
+
+    <message-handler i18n-name-key="advanced-create-or-comment-handler.name" key="AdvancedCreateOrCommentEmailHandler" class="com.ideotechnologies.jira.handler.AdvancedCreateOrCommentHandler" add-edit-url="/secure/admin/EditHandlerDetailsUsingParams!default.jspa" weight="0"/>
+     <!--message-handler i18n-name-key="advanced-create-issue-handler.name" key="AdvancedCreateIssueHandler" class="com.ideotechnologies.jira.handler.AdvancedCreateIssueHandler" add-edit-url="/secure/admin/EditCreateHandlerDetails!default.jspa" weight="0"/-->
+
+    <!-- import from the product container -->
+    <component-import key="applicationProperties" interface="com.atlassian.sal.api.ApplicationProperties" />
+
+    <webwork1 key="configureCreateActions" name="ConfigureCreateActions" class="java.lang.Object">
+        <actions>
+            <action name="com.ideotechnologies.jira.config.EditAdvancedCreateHandlerDetailsWebAction"
+                    alias="EditCreateHandlerDetails"
+                    roles-required="admin">
+                <view name="input">/view/EditCreateHandlerDetails.vm</view>
+                <view name="securitybreach">/secure/views/securitybreach.jsp</view>
+            </action>
+        </actions>
+    </webwork1>
+    <webwork1 key="configureCreateOrCommentActions" name="ConfigureCreateOrCommentActions" class="java.lang.Object">
+        <actions>
+            <action name="com.ideotechnologies.jira.config.EditAdvancedCreateOrCommentHandlerDetailsWebAction"
+                    alias="EditCreateOrCommentHandlerDetails"
+                    roles-required="admin">
+                <view name="input">/view/EditCreateOrCommentHandlerDetails.vm</view>
+                <view name="securitybreach">/secure/views/securitybreach.jsp</view>
+            </action>
+        </actions>
+    </webwork1>
+
+</atlassian-plugin>

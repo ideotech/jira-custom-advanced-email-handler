@@ -1,0 +1,105 @@
+## couple of available navigation helpers
+#set ($modifierKey = $action.browserUtils.getModifierKey())
+#set ($submitAccessKey = $i18n.getText('AUI.form.submit.button.accesskey'))
+#set ($submitTitle = $i18n.getText('AUI.form.submit.button.tooltip', [$submitAccessKey, $modifierKey]))
+#set ($cancelAccessKey = $i18n.getText('AUI.form.cancel.link.accesskey'))
+#set ($cancelTitle = $i18n.getText('AUI.form.cancel.link.tooltip', [$cancelAccessKey, $modifierKey]))
+<!--suppress HtmlUnknownTarget -->
+<html>
+<head>
+    <title>$action.handlerName</title>
+</head>
+<body>
+<form class="aui" action="EditCreateHandlerDetails.jspa" method="POST" name="mailHandlerForm" id="mailHandlerForm">
+    <div class="form-body">
+        <h2>$action.handlerName</h2>
+           <span class="global-errors-location">
+               #if ($action.getHasErrorMessages())
+                    #foreach ($error in $action.getFlushedErrorMessages())
+                   #AUImessage("error" "" $textutils.htmlEncode(${error}) "" "" "" "false")
+               #end
+                #end
+           </span>
+        <input type="hidden" name="atl_token" value="$atl_token"/>
+        <table>
+            <tr><td>
+                <label for="project-key">$i18n.getText('createhandler.project.key')</label>
+            </td><td>
+                <select name="selectedProject" id=project-key">
+                #foreach($project in $projects)
+                    #if($project == $selectedProject)
+                        <option value="${project.id}" selected>[$project.id] ${project.key}</option>
+                    #else
+                        <option value="${project.id}">[$project.id] ${project.key}</option>
+                    #end
+                #end
+                </select>
+            </td>
+            </tr>
+            <tr><td>
+                <label for="issue-type">$i18n.getText('createhandler.issueype')</label>
+            </td>
+                <td>
+                    <select name="selectedIssueType" id=issue-type">
+                      #foreach($issueType in $issueTypes)
+                        #if($issueType== $selectedIssueType)
+                            <option value="${issueType.id}" selected>[$issueType.id] ${issueType.name}</option>
+                        #else
+                            <option value="${issueType.id}">[$issueType.id] ${issueType.name}</option>
+                        #end
+                      #end
+                    </select>
+                </td>
+            </tr>
+            <tr><td>
+                <label for="cc-assignee">$i18n.getText('createhandler.cc-assignee')</label>
+            </td><td>
+                #if ($ccAssignee == true)
+                    <input type="checkbox" name="ccAssignee" id="cc-assignee" value="" checked>
+                #else
+                    <input type="checkbox" name="ccAssignee" id="cc-assignee" value="">
+                #end
+            </td></tr>
+            <tr><td>
+                <label for="component">$i18n.getText('createhandler.component')</label>
+                <input type="text" class="text" id="component" name="component" value="$!textutils.htmlEncode($component)">
+            </td></tr><tr><td>
+            <label for="reporter">$i18n.getText('createhandler.reporter')</label>
+        </td><td>
+            <input type="text" class="text" id="reporter" name="reporter" value="$!textutils.htmlEncode($reporter)">
+        </td></tr>
+            <tr><td>
+                <label for="createUsers">$i18n.getText('createhandler.create-users')</label>
+            </td><td>
+                #if ($createUsers == true)
+                    <input type="checkbox" name="createUsers" id="createUsers" value="" checked>
+                #else
+                    <input type="checkbox" name="createUsers" id="createUsers" value="">
+                #end
+            </td></tr>
+            <tr><td>
+                <label for="notifyUsers">$i18n.getText('createhandler.notify-users')</label>
+            </td>
+                <td>
+                    #if ($notifyUsers == true)
+                        <input type="checkbox" name="notifyUsers" id="notifyUsers" value="" checked>
+                    #else
+                        <input type="checkbox" name="notifyUsers" id="notifyUsers" value="">
+                    #end
+                </td></tr>
+        </table>
+        <div class="buttons-container form-footer">
+            <div class="buttons">
+                #if ($action.editing)
+                    #set ($addButtonLabel = $i18n.getText('common.words.save'))
+                #else
+                    #set ($addButtonLabel = $i18n.getText('common.forms.add'))
+                #end
+                <input id="addButton" type="submit" class="button" value="$!addButtonLabel" accesskey="$submitAccessKey" title="$submitTitle">
+                <a href="IncomingMailServers.jspa" class="cancel" accesskey="$cancelAccessKey" title="$cancelTitle">$i18n.getText("AUI.form.cancel.link.text")</a>
+            </div>
+        </div>
+    </div>
+</form>
+</body>
+</html>
