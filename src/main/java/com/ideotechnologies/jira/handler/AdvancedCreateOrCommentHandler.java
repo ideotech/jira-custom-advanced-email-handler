@@ -106,18 +106,6 @@ public class AdvancedCreateOrCommentHandler extends AbstractAdvancedEmailHandler
     private AdvancedCreateOrCommentHandler(CommentManager commentManager, IssueFactory issueFactory, ApplicationProperties applicationProperties, JiraApplicationContext jiraApplicationContext, AssigneeResolver assigneeResolver, FieldVisibilityManager fieldVisibilityManager, IssueUpdater issueUpdater) {
         super(commentManager, issueFactory, applicationProperties, jiraApplicationContext, assigneeResolver, fieldVisibilityManager, issueUpdater);
     }
-//    private final FieldVisibilityManager fieldVisibilityManager;
-//    private final AssigneeResolver assigneeResolver;
-
-
-//    private AdvancedCreateOrCommentHandler(ApplicationProperties applicationProperties, JiraApplicationContext jiraApplicationContext, FieldVisibilityManager fieldVisibilityManager, AssigneeResolver assigneeResolver)
-//
-//    {
-//        this.applicationProperties = applicationProperties;
-//        this.jiraApplicationContext = jiraApplicationContext;
-//        this.fieldVisibilityManager = fieldVisibilityManager;
-//        this.assigneeResolver = assigneeResolver;
-//    }
 
     @SuppressWarnings("ConstantConditions")
     public void init(Map<String, String> params,MessageHandlerErrorCollector messageHandlerErrorCollector)
