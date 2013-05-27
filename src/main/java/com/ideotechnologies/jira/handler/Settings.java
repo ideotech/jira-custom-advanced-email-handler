@@ -44,8 +44,9 @@ public class Settings
     public static final String ATTACHED_MESSAGE_FILENAME = "attachedmessage";
     public static final String DEFAULT_BINARY_FILE_NAME = "binary.bin";
     public static final char INVALID_CHAR_REPLACEMENT = '_';
-    public static final String KEY_CREATEUSERS = "createUsers";
-    public static final String KEY_NOTIFYUSERS = "notifyUsers";
+    public static final String KEY_CREATEUSERS = "createusers";
+    public static final String KEY_USERGROUP = "adduserstogroup";
+    public static final String KEY_NOTIFYUSERS = "notifyusers";
     public static final String KEY_CATCHEMAIL = "catchemail";
     public static final String KEY_FINGER_PRINT = "fingerprint";
     public static final String VALUE_FINGER_PRINT_ACCEPT = "accept";

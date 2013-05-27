@@ -1,6 +1,7 @@
 package com.ideotechnologies.jira.handler;
 
 import com.atlassian.core.util.RandomGenerator;
+import com.atlassian.crowd.embedded.api.Group;
 import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.JiraApplicationContext;
 import com.atlassian.jira.component.ComponentAccessor;
@@ -51,6 +52,7 @@ abstract class AbstractAdvancedEmailHandler implements MessageHandler {
     private boolean notifyUsers;
     String reporterUsername="";
     private boolean createUsers;
+    private String userGroup="";
     Map params = new HashMap();
     private static final FileNameCharacterCheckerUtil fileNameCharacterCheckerUtil = new FileNameCharacterCheckerUtil();
 
@@ -125,6 +127,13 @@ abstract class AbstractAdvancedEmailHandler implements MessageHandler {
             createUsers = false;
             log.debug("Defaulting to notifying users since user creation is not specified");
             notifyUsers = true;
+        }
+
+        if (params.containsKey(Settings.KEY_USERGROUP)) {
+            this.userGroup = (String)params.get(Settings.KEY_USERGROUP);
+            if (!createUsers) {
+                log.debug(Settings.KEY_USERGROUP + " parameter is set, but " +  Settings.KEY_CREATEUSERS + " is set to FALSE");
+            }
         }
 
         if (params.containsKey(Settings.KEY_FINGER_PRINT) && Settings.VALUES_FINGERPRINT.contains(params.get(Settings.KEY_FINGER_PRINT)))
@@ -548,6 +557,24 @@ abstract class AbstractAdvancedEmailHandler implements MessageHandler {
                 reporter = userUtil.createUserNoNotification(reporterEmail, password, reporterEmail, fullName);
             }
             log.debug("Created user " + reporterEmail + " as reporter of email-based issue.");
+
+            if (userGroup != null) {
+                // Remove all groups the user belong to
+
+                SortedSet <String> groupNames=userUtil.getGroupNamesForUser(reporter.getName());
+
+                List <Group> removeGroups=new ArrayList<Group>();
+
+                for (String groupName : groupNames) {
+                    removeGroups.add(ComponentAccessor.getGroupManager().getGroup(groupName));
+                }
+
+                userUtil.removeUserFromGroups(removeGroups,reporter);
+
+                // Add the user to the parameter group
+                userUtil.addUserToGroup(ComponentAccessor.getGroupManager().getGroup(userGroup),reporter);
+            }
+
         }
         catch (final Exception e)
         {
