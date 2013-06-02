@@ -110,6 +110,7 @@ public class AdvancedCreateOrCommentHandler extends AbstractAdvancedEmailHandler
     @SuppressWarnings("ConstantConditions")
     public void init(Map<String, String> params,MessageHandlerErrorCollector messageHandlerErrorCollector)
     {
+
         super.init(params);
 
         if (params.containsKey(Settings.KEY_PROJECT)) {
@@ -194,6 +195,7 @@ public class AdvancedCreateOrCommentHandler extends AbstractAdvancedEmailHandler
 
     @Override
     public boolean handleMessage(Message message, MessageHandlerContext context) throws MessagingException {
+        Boolean shallReindex=false;
         log.debug("AdvancedCreateOrCommentHandler3.handleMessage");
 
         if (!canHandleMessage(message)) {
@@ -350,7 +352,7 @@ public class AdvancedCreateOrCommentHandler extends AbstractAdvancedEmailHandler
 
                 customFieldToSet.updateValue(fieldLayoutItem, currentIssue, modifiedValue, issueChangeHolder);
 
-                reindexIssue(currentIssue);
+                shallReindex=true;
 
             }
 
@@ -365,6 +367,11 @@ public class AdvancedCreateOrCommentHandler extends AbstractAdvancedEmailHandler
 
             }
             // /////////////
+
+            shallReindex |= addCCUserToCustomField(message,currentIssue);
+
+            if (shallReindex == true)
+                reindexIssue(currentIssue);
 
             return doDelete;
         } else {

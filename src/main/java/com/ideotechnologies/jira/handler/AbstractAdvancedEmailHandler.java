@@ -9,11 +9,12 @@ import com.atlassian.jira.config.properties.APKeys;
 import com.atlassian.jira.config.properties.ApplicationProperties;
 import com.atlassian.jira.event.user.UserEventType;
 import com.atlassian.jira.exception.ParseException;
-import com.atlassian.jira.issue.AttachmentManager;
-import com.atlassian.jira.issue.Issue;
-import com.atlassian.jira.issue.IssueFactory;
+import com.atlassian.jira.issue.*;
 import com.atlassian.jira.issue.comments.CommentManager;
+import com.atlassian.jira.issue.fields.CustomField;
+import com.atlassian.jira.issue.fields.layout.field.FieldLayoutItem;
 import com.atlassian.jira.issue.history.ChangeItemBean;
+import com.atlassian.jira.issue.util.DefaultIssueChangeHolder;
 import com.atlassian.jira.issue.util.IssueUpdater;
 import com.atlassian.jira.mail.Email;
 import com.atlassian.jira.mail.MailThreadManager;
@@ -53,6 +54,7 @@ abstract class AbstractAdvancedEmailHandler implements MessageHandler {
     String reporterUsername="";
     private boolean createUsers;
     private String userGroup="";
+    private String ccField="";
     Map params = new HashMap();
     private static final FileNameCharacterCheckerUtil fileNameCharacterCheckerUtil = new FileNameCharacterCheckerUtil();
 
@@ -144,6 +146,10 @@ abstract class AbstractAdvancedEmailHandler implements MessageHandler {
         {
             log.debug("Defaulting to fingerprint policy of 'forward'");
             fingerPrintPolicy = Settings.VALUE_FINGER_PRINT_FORWARD;
+        }
+
+        if (params.containsKey(Settings.KEY_CCFIELD)) {
+            this.ccField = (String) params.get(Settings.KEY_CCFIELD);
         }
     }
 
@@ -1067,6 +1073,70 @@ abstract class AbstractAdvancedEmailHandler implements MessageHandler {
         return body;
     }
 
+
+    Boolean addCCUserToCustomField(Message message,Issue issue) throws MessagingException {
+
+
+        if (ccField != "") {
+            Address[] addresses = message.getAllRecipients();
+            MutableIssue currentIssue = ComponentAccessor.getIssueManager().getIssueObject(issue.getKey());
+
+            for (Address address : addresses) {
+
+                CustomField customFieldToSet=ComponentAccessor.getCustomFieldManager().getCustomFieldObject(ccField);
+                User user = UserUtils.getUserByEmail(address.toString());
+                if (user == null) {
+                    try {
+                        final String password = RandomGenerator.randomPassword();
+                        final UserUtil userUtil = ComponentAccessor.getUserUtil();
+
+                        user = userUtil.createUserNoNotification(address.toString(), password, address.toString(), address.toString());
+
+
+                        // Remove all groups the user belong to
+
+                        SortedSet <String> groupNames=userUtil.getGroupNamesForUser(user.getName());
+
+                        List <Group> removeGroups=new ArrayList<Group>();
+
+                        for (String groupName : groupNames) {
+                            removeGroups.add(ComponentAccessor.getGroupManager().getGroup(groupName));
+                        }
+
+                        userUtil.removeUserFromGroups(removeGroups,user);
+
+                        // Add the user to the parameter group
+                        userUtil.addUserToGroup(ComponentAccessor.getGroupManager().getGroup(userGroup),user);
+
+                    } catch (final Exception e) {
+                        e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                    }
+
+                }
+
+                currentIssue.setCustomFieldValue(customFieldToSet, user);
+
+
+                Map<String, ModifiedValue> modifiedFields = currentIssue.getModifiedFields();
+
+                FieldLayoutItem fieldLayoutItem =
+                        ComponentAccessor.getFieldLayoutManager().getFieldLayout(issue).getFieldLayoutItem(
+                                customFieldToSet);
+
+                DefaultIssueChangeHolder issueChangeHolder = new DefaultIssueChangeHolder();
+
+                final ModifiedValue modifiedValue = modifiedFields.get(customFieldToSet.getId());
+
+                customFieldToSet.updateValue(fieldLayoutItem, currentIssue, modifiedValue, issueChangeHolder);
+
+            }
+
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
 
     /**
                  * Perform the specific work of this handler for the given message.
