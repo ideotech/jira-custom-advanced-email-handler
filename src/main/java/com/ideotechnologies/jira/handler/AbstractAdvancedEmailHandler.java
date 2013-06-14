@@ -37,6 +37,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 abstract class AbstractAdvancedEmailHandler implements MessageHandler {
 
@@ -1078,60 +1080,96 @@ abstract class AbstractAdvancedEmailHandler implements MessageHandler {
 
 
         if (ccField != "") {
-            Address[] addresses = message.getAllRecipients();
-            MutableIssue currentIssue = ComponentAccessor.getIssueManager().getIssueObject(issue.getKey());
+            Address[] addresses = message.getRecipients(Message.RecipientType.CC);
+            MutableIssue mutableIssue = ComponentAccessor.getIssueManager().getIssueObject(issue.getKey());
+            CustomField customFieldToSet=ComponentAccessor.getCustomFieldManager().getCustomFieldObject(ccField);
+            // List<User> multiSelectValues = new ArrayList<User>();
+            List <User> currentCCList = (List)mutableIssue.getCustomFieldValue(customFieldToSet);
+            List <User> newCCList = new ArrayList<User>();
 
-            for (Address address : addresses) {
+            if (currentCCList != null) {
+                for (User ccItem : currentCCList){
+                    newCCList.add(ccItem);
+                }
+            }
 
-                CustomField customFieldToSet=ComponentAccessor.getCustomFieldManager().getCustomFieldObject(ccField);
-                User user = UserUtils.getUserByEmail(address.toString());
-                if (user == null) {
-                    try {
-                        final String password = RandomGenerator.randomPassword();
-                        final UserUtil userUtil = ComponentAccessor.getUserUtil();
+            if (addresses != null) {
+                for (Address address : addresses) {
 
-                        user = userUtil.createUserNoNotification(address.toString(), password, address.toString(), address.toString());
+                    String stringAddress="";
+
+                    Pattern p = Pattern.compile("(.*?)<([^>]+)>.*,?", Pattern.DOTALL);
+                    Matcher m = p.matcher(address.toString());
+
+                    if (m.find())
+                        stringAddress=m.group(2);
+                    else
+                        stringAddress=address.toString();
 
 
-                        // Remove all groups the user belong to
 
-                        SortedSet <String> groupNames=userUtil.getGroupNamesForUser(user.getName());
+                    User user = UserUtils.getUserByEmail(stringAddress);
+                    if (user == null) {
+                        try {
+                            final String password = RandomGenerator.randomPassword();
+                            final UserUtil userUtil = ComponentAccessor.getUserUtil();
 
-                        List <Group> removeGroups=new ArrayList<Group>();
+                            user = userUtil.createUserNoNotification(stringAddress, password, stringAddress, stringAddress);
 
-                        for (String groupName : groupNames) {
-                            removeGroups.add(ComponentAccessor.getGroupManager().getGroup(groupName));
+
+                            // Remove all groups the user belong to
+
+                            SortedSet <String> groupNames=userUtil.getGroupNamesForUser(user.getName());
+
+                            List <Group> removeGroups=new ArrayList<Group>();
+
+                            for (String groupName : groupNames) {
+                                removeGroups.add(ComponentAccessor.getGroupManager().getGroup(groupName));
+                            }
+
+                            userUtil.removeUserFromGroups(removeGroups,user);
+
+                            // Add the user to the parameter group
+                            userUtil.addUserToGroup(ComponentAccessor.getGroupManager().getGroup(userGroup),user);
+
+                        } catch (final Exception e) {
+                            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
                         }
 
-                        userUtil.removeUserFromGroups(removeGroups,user);
-
-                        // Add the user to the parameter group
-                        userUtil.addUserToGroup(ComponentAccessor.getGroupManager().getGroup(userGroup),user);
-
-                    } catch (final Exception e) {
-                        e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
                     }
+
+                    if ((currentCCList == null) || (currentCCList != null && !currentCCList.contains(user)))
+                        newCCList.add(user);
+                    // multiSelectValues.add(user);
 
                 }
 
-                currentIssue.setCustomFieldValue(customFieldToSet, user);
+
+//                currentIssue.setCustomFieldValue(customFieldToSet, user);
+
+                if (!newCCList.equals(currentCCList)) {
+                    DefaultIssueChangeHolder issueChangeHolder = new DefaultIssueChangeHolder();
+                    FieldLayoutItem fieldLayoutItem = ComponentAccessor.getFieldLayoutManager().getFieldLayout(issue).getFieldLayoutItem(
+                            customFieldToSet);
+
+                    customFieldToSet.updateValue(fieldLayoutItem, issue, new ModifiedValue(currentCCList, newCCList), issueChangeHolder);
+
+                    if (mutableIssue.getKey() != null) {
+                        // Remove duplicated issue update
+                        if (mutableIssue.getModifiedFields().containsKey(customFieldToSet.getId())) {
+                            mutableIssue.getModifiedFields().remove(customFieldToSet.getId());
+                        }
+                    }
+                }
 
 
-                Map<String, ModifiedValue> modifiedFields = currentIssue.getModifiedFields();
 
-                FieldLayoutItem fieldLayoutItem =
-                        ComponentAccessor.getFieldLayoutManager().getFieldLayout(issue).getFieldLayoutItem(
-                                customFieldToSet);
 
-                DefaultIssueChangeHolder issueChangeHolder = new DefaultIssueChangeHolder();
-
-                final ModifiedValue modifiedValue = modifiedFields.get(customFieldToSet.getId());
-
-                customFieldToSet.updateValue(fieldLayoutItem, currentIssue, modifiedValue, issueChangeHolder);
-
+                return true;
             }
-
-            return true;
+            else  {
+                return false;
+            }
         }
         else {
             return false;

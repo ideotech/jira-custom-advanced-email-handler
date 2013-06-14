@@ -266,7 +266,6 @@ public class AdvancedCreateIssueHandler extends AbstractAdvancedEmailHandler {
             if (!securityLevelSet)
                 setDefaultSecurityLevel(issueObject);
 
-
             Map<String,Object> fields = new HashMap<String,Object>();
             fields.put("issue", issueObject);
 
@@ -287,6 +286,7 @@ public class AdvancedCreateIssueHandler extends AbstractAdvancedEmailHandler {
                 recordMessageId(MailThreadManager.MailAction.ISSUE_CREATED_FROM_EMAIL, message, issue);
             }
 
+            addCCUserToCustomField(message,issueObject);
             createAttachmentsForMessage(message, issue);
 
             return true;

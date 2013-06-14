@@ -37,7 +37,7 @@ public abstract class AbstractAdvancedCommentHandler extends AbstractAdvancedEma
     private static final Logger log = Logger.getLogger(AbstractAdvancedCommentHandler.class);
     private final PermissionManager permissionManager;
     private final IssueUpdater issueUpdater;
-    Boolean registerSenderInCommentText;
+    Boolean registerSenderInCommentText=false;
 
     AbstractAdvancedCommentHandler(PermissionManager permissionManager, IssueUpdater issueUpdater, CommentManager commentManager, IssueFactory issueFactory, ApplicationProperties applicationProperties, JiraApplicationContext jiraApplicationContext, final AssigneeResolver assigneeResolver, final FieldVisibilityManager fieldVisibilityManager)
     {
