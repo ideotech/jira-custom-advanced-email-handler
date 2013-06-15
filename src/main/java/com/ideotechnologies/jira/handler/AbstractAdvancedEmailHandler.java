@@ -153,6 +153,7 @@ abstract class AbstractAdvancedEmailHandler implements MessageHandler {
         if (params.containsKey(Settings.KEY_CCFIELD)) {
             this.ccField = (String) params.get(Settings.KEY_CCFIELD);
         }
+
     }
 
     /**
@@ -1078,9 +1079,9 @@ abstract class AbstractAdvancedEmailHandler implements MessageHandler {
 
     Boolean addCCUserToCustomField(Message message,Issue issue) throws MessagingException {
 
-
+        Boolean shallReindex=false;
         if (ccField != "") {
-            Address[] addresses = message.getRecipients(Message.RecipientType.CC);
+
             MutableIssue mutableIssue = ComponentAccessor.getIssueManager().getIssueObject(issue.getKey());
             CustomField customFieldToSet=ComponentAccessor.getCustomFieldManager().getCustomFieldObject(ccField);
             // List<User> multiSelectValues = new ArrayList<User>();
@@ -1093,45 +1094,14 @@ abstract class AbstractAdvancedEmailHandler implements MessageHandler {
                 }
             }
 
+            Address[] addresses = message.getRecipients(Message.RecipientType.CC);
             if (addresses != null) {
                 for (Address address : addresses) {
 
-                    String stringAddress="";
-
-                    Pattern p = Pattern.compile("(.*?)<([^>]+)>.*,?", Pattern.DOTALL);
-                    Matcher m = p.matcher(address.toString());
-
-                    if (m.find())
-                        stringAddress=m.group(2);
-                    else
-                        stringAddress=address.toString();
-
-
-
-                    User user = UserUtils.getUserByEmail(stringAddress);
+                    User user = UserUtils.getUserByEmail(cleanEmailAddress(address));
                     if (user == null) {
                         try {
-                            final String password = RandomGenerator.randomPassword();
-                            final UserUtil userUtil = ComponentAccessor.getUserUtil();
-
-                            user = userUtil.createUserNoNotification(stringAddress, password, stringAddress, stringAddress);
-
-
-                            // Remove all groups the user belong to
-
-                            SortedSet <String> groupNames=userUtil.getGroupNamesForUser(user.getName());
-
-                            List <Group> removeGroups=new ArrayList<Group>();
-
-                            for (String groupName : groupNames) {
-                                removeGroups.add(ComponentAccessor.getGroupManager().getGroup(groupName));
-                            }
-
-                            userUtil.removeUserFromGroups(removeGroups,user);
-
-                            // Add the user to the parameter group
-                            userUtil.addUserToGroup(ComponentAccessor.getGroupManager().getGroup(userGroup),user);
-
+                            user=createNewUser(address);
                         } catch (final Exception e) {
                             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
                         }
@@ -1140,12 +1110,8 @@ abstract class AbstractAdvancedEmailHandler implements MessageHandler {
 
                     if ((currentCCList == null) || (currentCCList != null && !currentCCList.contains(user)))
                         newCCList.add(user);
-                    // multiSelectValues.add(user);
 
                 }
-
-
-//                currentIssue.setCustomFieldValue(customFieldToSet, user);
 
                 if (!newCCList.equals(currentCCList)) {
                     DefaultIssueChangeHolder issueChangeHolder = new DefaultIssueChangeHolder();
@@ -1162,18 +1128,52 @@ abstract class AbstractAdvancedEmailHandler implements MessageHandler {
                     }
                 }
 
-
-
-
-                return true;
+                shallReindex = true;
             }
-            else  {
-                return false;
-            }
+
         }
-        else {
-            return false;
+
+        return shallReindex;
+    }
+
+    String cleanEmailAddress(Address address) {
+        String cleanEmailAddress= new String();
+
+        Pattern p = Pattern.compile("(.*?)<([^>]+)>.*,?", Pattern.DOTALL);
+        Matcher m = p.matcher(address.toString());
+
+        if (m.find())
+            cleanEmailAddress=m.group(2);
+        else
+            cleanEmailAddress=address.toString();
+
+        return cleanEmailAddress;
+    }
+
+    User createNewUser(Address address) throws Exception {
+
+        final String password = RandomGenerator.randomPassword();
+        final UserUtil userUtil = ComponentAccessor.getUserUtil();
+
+        User user = userUtil.createUserNoNotification(cleanEmailAddress(address), password,
+                cleanEmailAddress(address), cleanEmailAddress(address));
+
+        // Remove all groups the user belong to
+        SortedSet <String> groupNames=userUtil.getGroupNamesForUser(user.getName());
+
+        List <Group> removeGroups=new ArrayList<Group>();
+
+        for (String groupName : groupNames) {
+            removeGroups.add(ComponentAccessor.getGroupManager().getGroup(groupName));
         }
+
+        userUtil.removeUserFromGroups(removeGroups,user);
+
+        // Add the user to the parameter group
+        userUtil.addUserToGroup(ComponentAccessor.getGroupManager().getGroup(userGroup),user);
+
+        return user;
+
     }
 
     /**
