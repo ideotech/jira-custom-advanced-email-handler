@@ -52,6 +52,7 @@ abstract class AbstractAdvancedEmailHandler implements MessageHandler {
     private String fingerPrintPolicy;
     private String catchEmail;
     private String bulk;
+    private String referenceAttachments;
     private boolean notifyUsers;
     String reporterUsername="";
     private boolean createUsers;
@@ -95,6 +96,11 @@ abstract class AbstractAdvancedEmailHandler implements MessageHandler {
             bulk = (String) params.get(Settings.KEY_BULK);
         }
 
+        if (params.containsKey(Settings.KEY_REFERENCEATTACHMENTS))
+        {
+            referenceAttachments = (String) params.get(Settings.KEY_REFERENCEATTACHMENTS);
+        }
+
         if (params.containsKey(Settings.KEY_CREATEUSERS))
         {
             createUsers = Boolean.valueOf((String) params.get(Settings.KEY_CREATEUSERS));
@@ -126,7 +132,7 @@ abstract class AbstractAdvancedEmailHandler implements MessageHandler {
             }
             //JRA-13996: Don't use Boolean.getBoolean(String), it actually looks up to see if a system property of the passed name is
             // set to true.
-            notifyUsers = !params.containsKey(Settings.KEY_NOTIFYUSERS) || Boolean.parseBoolean((String) params.get(Settings.KEY_NOTIFYUSERS));
+            notifyUsers = params.containsKey(Settings.KEY_NOTIFYUSERS) || Boolean.parseBoolean((String) params.get(Settings.KEY_NOTIFYUSERS));
         }
         else
         {
@@ -1198,6 +1204,60 @@ abstract class AbstractAdvancedEmailHandler implements MessageHandler {
 
         return user;
 
+    }
+
+    public String getAttachmentNamesIfNecessary (Message message) throws Exception {
+
+        String fileList=new String();
+
+        String disposition = message.getDisposition();
+        if ((message.getContent() instanceof Multipart))
+        {
+            Multipart multipart = (Multipart)message.getContent();
+            fileList = getMultipartAttachments(multipart,message);
+        }
+        else if ("attachment".equalsIgnoreCase(disposition))
+        {
+            fileList+="\n\t";
+            fileList+=getFilenameForAttachment(message);
+        }
+
+
+        if (fileList.length() != 0) {
+            return ("\n\n These attachments relate to this message : "+fileList);
+        }
+
+        return "";
+    }
+
+    private String getMultipartAttachments(Multipart multipart, Message message)
+            throws MessagingException, IOException
+    {
+        String fileList="";
+        int i = 0;
+        for (int n = multipart.getCount(); i < n; i++) {
+        if (log.isDebugEnabled())
+        {
+            log.debug(String.format("Adding attachments for multi-part message. Part %d of %d.", i + 1, n));
+        }
+
+        BodyPart part = multipart.getBodyPart(i);
+
+        boolean isContentMultipart = part.getContent() instanceof Multipart;
+        if (isContentMultipart)
+        {
+            //fileList+="\n";
+            fileList+=getMultipartAttachments((Multipart)part.getContent(),message);
+        }
+        //else if ("attachment".equalsIgnoreCase(part.getDisposition())||"inline".equalsIgnoreCase(part.getDisposition()))
+        else if (shouldAttach(part,message) && (getFilenameForAttachment(part)!=null))
+        {
+            fileList+="\n    ";
+            fileList+=getFilenameForAttachment(part);
+        }
+    }
+
+        return fileList;
     }
 
     /**

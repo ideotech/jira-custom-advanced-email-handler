@@ -58,6 +58,7 @@ public class Settings
     public static final String VALUE_BULK_DELETE = "delete";
     public static final String KEY_BULK = "bulk";
     public static final String FALSE = "false";
+    public static final String TRUE = "true";
     public static final String KEY_CCFIELD="ccField";
     public static final String KEY_REFERENCEATTACHMENTS="referenceattachments";
 }

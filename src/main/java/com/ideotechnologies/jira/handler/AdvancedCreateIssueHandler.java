@@ -180,6 +180,9 @@ public class AdvancedCreateIssueHandler extends AbstractAdvancedEmailHandler {
 
             issueObject.setProjectId(project.getId());
             issueObject.setSummary(summary);
+
+            description+=getAttachmentNamesIfNecessary(message);
+
             issueObject.setDescription(description);
             issueObject.setIssueTypeId(issueType);
             issueObject.setReporter(reporter);

@@ -73,6 +73,7 @@ public abstract class AbstractAdvancedCommentHandler extends AbstractAdvancedEma
 
                 if (body != null)
                 {
+                    body+=getAttachmentNamesIfNecessary(message);
                     //get either the sender of the message, or the default reporter
                     User reporter = getReporter(message);
 
