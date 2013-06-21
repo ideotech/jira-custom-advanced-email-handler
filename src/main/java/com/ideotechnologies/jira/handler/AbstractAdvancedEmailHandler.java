@@ -57,6 +57,9 @@ abstract class AbstractAdvancedEmailHandler implements MessageHandler {
     private boolean createUsers;
     private String userGroup="";
     private String ccField="";
+    /** Regex for JIRA email address. */
+    String jiraEmail;
+
     Map params = new HashMap();
     private static final FileNameCharacterCheckerUtil fileNameCharacterCheckerUtil = new FileNameCharacterCheckerUtil();
 
@@ -1094,10 +1097,30 @@ abstract class AbstractAdvancedEmailHandler implements MessageHandler {
                 }
             }
 
-            Address[] addresses = message.getRecipients(Message.RecipientType.CC);
-            if (addresses != null) {
-                for (Address address : addresses) {
+            //Address[] addresses = message.getRecipients(Message.RecipientType.CC);
+            // Address[] addresses=new Address[0];
 
+            //Address[] addresses=new Address[message.getRecipients(Message.RecipientType.CC).length+message.getRecipients(Message.RecipientType.TO).length];
+
+            List<Address> addressList = new ArrayList<Address>();
+
+            if (message.getRecipients(Message.RecipientType.CC)!= null)
+               for (Address address : message.getRecipients(Message.RecipientType.CC)){
+                   addressList.add(address);
+               }
+            for (Address address : message.getRecipients(Message.RecipientType.TO)){
+                addressList.add(address);
+            }
+            //System.arraycopy(message.getRecipients(Message.RecipientType.CC),0,addresses,0,message.getRecipients(Message.RecipientType.CC).length);
+            //System.arraycopy(message.getRecipients(Message.RecipientType.TO),0,addresses,addresses.length,message.getRecipients(Message.RecipientType.TO).length);
+
+            //Address[] addresses= (Address[]) addressList.toArray();
+            //addressList.toArray(addresses);
+
+            if (addressList != null) {
+                for (Address address : addressList) {
+
+                    if ((jiraEmail == null) || (cleanEmailAddress(address).compareTo(jiraEmail) != 0)) {
                     User user = UserUtils.getUserByEmail(cleanEmailAddress(address));
                     if (user == null) {
                         try {
@@ -1129,6 +1152,7 @@ abstract class AbstractAdvancedEmailHandler implements MessageHandler {
                 }
 
                 shallReindex = true;
+                }
             }
 
         }

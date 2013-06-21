@@ -469,6 +469,10 @@ public class AdvancedCreateIssueHandler extends AbstractAdvancedEmailHandler {
         this.issueDescriptor = issueDescriptor;
     }
 
+     void setJiraEmail(String email){
+       jiraEmail=email;
+    }
+
 
     /**
      * Attaches plaintext parts.
