@@ -60,5 +60,6 @@ public class Settings
     public static final String FALSE = "false";
     public static final String TRUE = "true";
     public static final String KEY_CCFIELD="ccField";
+    public static final String KEY_EXCLUDEADDRESS="excludeaddress";
     public static final String KEY_REFERENCEATTACHMENTS="referenceattachments";
 }

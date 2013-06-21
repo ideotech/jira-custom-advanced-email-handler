@@ -57,6 +57,7 @@ public class AdvancedCreateIssueHandler extends AbstractAdvancedEmailHandler {
     private String defaultIssueType = null;   // default type for new issues
     private String defaultComponentName = null;   // default component for new issues in the default project
     private boolean ccAssignee = true;        // first Cc user becomes the assignee ?
+    private String excludeAddress;
 
     AdvancedCreateIssueHandler(CommentManager commentManager, IssueFactory issueFactory, ApplicationProperties applicationProperties, JiraApplicationContext jiraApplicationContext, AssigneeResolver assigneeResolver, FieldVisibilityManager fieldvisibilityManager, IssueUpdater issueUpdater) {
         super(commentManager, issueFactory, applicationProperties, jiraApplicationContext, assigneeResolver, fieldvisibilityManager,issueUpdater);
@@ -96,6 +97,10 @@ public class AdvancedCreateIssueHandler extends AbstractAdvancedEmailHandler {
             defaultComponentName = params.get(Settings.KEY_COMPONENT);
         }
 
+        if (params.containsKey(Settings.KEY_EXCLUDEADDRESS))
+        {
+            excludeAddress = params.get(Settings.KEY_EXCLUDEADDRESS);
+        }
         log.debug("Params: " + this.defaultProjectKey + " - " + this.defaultIssueType + " - " + this.ccAssignee + " - " + this.defaultComponentName);
     }
 
@@ -127,6 +132,13 @@ public class AdvancedCreateIssueHandler extends AbstractAdvancedEmailHandler {
                         "is set to false (or external user management is enabled). Message rejected.";
                 log.warn(errorMessage);
                 return false;
+            }
+
+            if ((excludeAddress!=null) && (reporter.getName().compareTo(excludeAddress) == 0)) {
+                String errorMessage = "Message coming from the excluded address. Message rejected.";
+                log.warn(errorMessage);
+                return true;            // the message shall be deleted as it is not a configuration issue
+
             }
 
             Project project = getProject();
