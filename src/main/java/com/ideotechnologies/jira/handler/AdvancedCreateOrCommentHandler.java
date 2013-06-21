@@ -86,8 +86,6 @@ public class AdvancedCreateOrCommentHandler extends AbstractAdvancedEmailHandler
     private String defaultIssueType;
     /** If set (to anything), quoted text is removed from comments. */
     private Boolean stripQuotes;
-    /** Regex for JIRA email address. */
-    private String jiraEmail;
     /** Regex for alias of JIRA email address. */
     private String jiraEmailAlias;
     /** related custom field */
@@ -126,7 +124,7 @@ public class AdvancedCreateOrCommentHandler extends AbstractAdvancedEmailHandler
         }
 
         if (params.containsKey(Settings.KEY_JIRAEMAIL)) {
-            this.jiraEmail = params.get(Settings.KEY_JIRAEMAIL);
+            jiraEmail = params.get(Settings.KEY_JIRAEMAIL);
         }
 
         if (params.containsKey(Settings.KEY_CUSTOMFIELD)) {
@@ -376,6 +374,7 @@ public class AdvancedCreateOrCommentHandler extends AbstractAdvancedEmailHandler
             return doDelete;
         } else {
             AdvancedCreateIssueHandler createIssueHandler = new AdvancedCreateIssueHandler(commentManager,issueFactory,applicationProperties,jiraApplicationContext,assigneeResolver,fieldVisibilityManager,issueUpdater);
+            createIssueHandler.setJiraEmail(jiraEmail);
             createIssueHandler.setIssueDescriptor(issueDescriptor);
             createIssueHandler.init(params,monitor);
             return createIssueHandler.handleMessage(message,context);
