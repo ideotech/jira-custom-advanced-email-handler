@@ -63,17 +63,6 @@ public class AdvancedCreateIssueHandler extends AbstractAdvancedEmailHandler {
         super(commentManager, issueFactory, applicationProperties, jiraApplicationContext, assigneeResolver, fieldvisibilityManager,issueUpdater);
     }
 
-//    protected AdvancedCreateIssueHandler(final CommentManager commentManager, final IssueFactory issueFactory, final ApplicationProperties applicationProperties, final JiraApplicationContext jiraApplicationContext,final AssigneeResolver assigneeResolver, final FieldVisibilityManager fieldVisibilityManager)
-//    {
-//        this.commentManager = commentManager;
-//        this.issueFactory = issueFactory;
-//        this.applicationProperties = applicationProperties;
-//        this.jiraApplicationContext = jiraApplicationContext;
-//        this.assigneeResolver = assigneeResolver;
-//        this.fieldVisibilityManager = fieldVisibilityManager;
-//    }
-
-
     public void init(Map<String, String> params, MessageHandlerErrorCollector messageHandlerErrorCollector) {
         //To change body of implemented methods use File | Settings | File Templates.
 

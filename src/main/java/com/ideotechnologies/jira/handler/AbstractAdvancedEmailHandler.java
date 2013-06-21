@@ -1224,7 +1224,7 @@ abstract class AbstractAdvancedEmailHandler implements MessageHandler {
 
 
         if (fileList.length() != 0) {
-            return ("\n\n These attachments relate to this message : "+fileList);
+            return ("\\\\ \\\\{panel}These attachments relate to this message : "+fileList+"\n{panel}");
         }
 
         return "";
