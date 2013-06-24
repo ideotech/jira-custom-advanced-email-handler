@@ -1110,13 +1110,14 @@ abstract class AbstractAdvancedEmailHandler implements MessageHandler {
 
             List<Address> addressList = new ArrayList<Address>();
 
+            for (Address address : message.getRecipients(Message.RecipientType.TO)){
+                addressList.add(address);
+            }
             if (message.getRecipients(Message.RecipientType.CC)!= null)
                for (Address address : message.getRecipients(Message.RecipientType.CC)){
                    addressList.add(address);
                }
-            for (Address address : message.getRecipients(Message.RecipientType.TO)){
-                addressList.add(address);
-            }
+
             //System.arraycopy(message.getRecipients(Message.RecipientType.CC),0,addresses,0,message.getRecipients(Message.RecipientType.CC).length);
             //System.arraycopy(message.getRecipients(Message.RecipientType.TO),0,addresses,addresses.length,message.getRecipients(Message.RecipientType.TO).length);
 
@@ -1214,12 +1215,13 @@ abstract class AbstractAdvancedEmailHandler implements MessageHandler {
         if ((message.getContent() instanceof Multipart))
         {
             Multipart multipart = (Multipart)message.getContent();
-            fileList = getMultipartAttachments(multipart,message);
+            fileList = getMultipartAttachmentsNames(multipart,message);
         }
         else if ("attachment".equalsIgnoreCase(disposition))
         {
-            fileList+="\n\t";
+            fileList+="\n\t[^";
             fileList+=getFilenameForAttachment(message);
+            fileList+="]";
         }
 
 
@@ -1230,7 +1232,7 @@ abstract class AbstractAdvancedEmailHandler implements MessageHandler {
         return "";
     }
 
-    private String getMultipartAttachments(Multipart multipart, Message message)
+    private String getMultipartAttachmentsNames(Multipart multipart, Message message)
             throws MessagingException, IOException
     {
         String fileList="";
@@ -1247,13 +1249,14 @@ abstract class AbstractAdvancedEmailHandler implements MessageHandler {
         if (isContentMultipart)
         {
             //fileList+="\n";
-            fileList+=getMultipartAttachments((Multipart)part.getContent(),message);
+            fileList+=getMultipartAttachmentsNames((Multipart)part.getContent(),message);
         }
         //else if ("attachment".equalsIgnoreCase(part.getDisposition())||"inline".equalsIgnoreCase(part.getDisposition()))
         else if (shouldAttach(part,message) && (getFilenameForAttachment(part)!=null))
         {
-            fileList+="\n    ";
+            fileList+="\n    [^";
             fileList+=getFilenameForAttachment(part);
+            fileList+="]";
         }
     }
 
