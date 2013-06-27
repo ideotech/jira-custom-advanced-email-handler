@@ -1110,13 +1110,19 @@ abstract class AbstractAdvancedEmailHandler implements MessageHandler {
 
             List<Address> addressList = new ArrayList<Address>();
 
-            for (Address address : message.getRecipients(Message.RecipientType.TO)){
-                addressList.add(address);
+            if (message.getRecipients(Message.RecipientType.TO)!= null){
+               for (Address address : message.getRecipients(Message.RecipientType.TO)){
+                  addressList.add(address);
+               }
             }
             if (message.getRecipients(Message.RecipientType.CC)!= null)
                for (Address address : message.getRecipients(Message.RecipientType.CC)){
                    addressList.add(address);
                }
+            if (message.getRecipients(Message.RecipientType.BCC)!= null)
+                for (Address address : message.getRecipients(Message.RecipientType.BCC)){
+                    addressList.add(address);
+                }
 
             //System.arraycopy(message.getRecipients(Message.RecipientType.CC),0,addresses,0,message.getRecipients(Message.RecipientType.CC).length);
             //System.arraycopy(message.getRecipients(Message.RecipientType.TO),0,addresses,addresses.length,message.getRecipients(Message.RecipientType.TO).length);

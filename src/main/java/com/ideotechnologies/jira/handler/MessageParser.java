@@ -58,8 +58,9 @@ class MessageParser {
             if (toHeader == null) {
                 // This should never happen as in this case Jira is supposed
                 // not having received the message
-                log.error("Jira email address not found amongst recipients.");
-                return issue;
+                log.error("Jira email address not found amongst recipients. Using the first emailAddress as the recipient");
+                issue.setProjectKey(emailAddresses[0]);
+                //return issue;
             }
         } catch (MessagingException e) {
             log.error("Error while parsing the message: ", e);
