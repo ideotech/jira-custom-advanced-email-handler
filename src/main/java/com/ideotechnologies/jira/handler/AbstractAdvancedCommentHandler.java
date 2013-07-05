@@ -158,6 +158,10 @@ public abstract class AbstractAdvancedCommentHandler extends AbstractAdvancedEma
         // Do not let the issueUpdater generate change items. We have already generated all the needed ones.
         // So pass in 'false'.
         issueUpdater.doUpdate(issueUpdateBean, false);
+
+        //ComponentAccessor.getIssueEventManager().dispatchEvent(EventType.ISSUE_COMMENTED_ID,issue,reporter,issueUpdateBean.getComment(),
+        //      issueUpdateBean.getWorklog(),null,issueUpdateBean.getParams(),true);
+
     }
 
     /**

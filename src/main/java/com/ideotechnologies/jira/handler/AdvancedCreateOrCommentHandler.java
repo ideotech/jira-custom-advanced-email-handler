@@ -35,7 +35,6 @@ import com.atlassian.jira.util.ImportUtils;
 import com.atlassian.jira.util.JiraUtils;
 import com.atlassian.jira.web.FieldVisibilityManager;
 import com.atlassian.jira.workflow.*;
-import com.atlassian.mail.MailUtils;
 import com.opensymphony.workflow.loader.ActionDescriptor;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
@@ -309,7 +308,6 @@ public class AdvancedCreateOrCommentHandler extends AbstractAdvancedEmailHandler
                 doDelete = nq.handleMessage(message,context); // get message without
                 // quotes
             }
-
 
             MutableIssue currentIssue = ComponentAccessor.getIssueManager().getIssueObject(issue.getKey());
 

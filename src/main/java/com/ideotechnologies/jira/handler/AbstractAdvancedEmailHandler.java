@@ -26,7 +26,6 @@ import com.atlassian.jira.user.util.UserUtil;
 import com.atlassian.jira.util.dbc.Assertions;
 import com.atlassian.jira.web.FieldVisibilityManager;
 import com.atlassian.jira.web.util.FileNameCharacterCheckerUtil;
-import com.atlassian.mail.MailUtils;
 import com.opensymphony.util.TextUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;

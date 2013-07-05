@@ -15,7 +15,6 @@ import com.atlassian.jira.plugin.assignee.AssigneeResolver;
 import com.atlassian.jira.security.PermissionManager;
 import com.atlassian.jira.service.util.handler.MessageHandlerErrorCollector;
 import com.atlassian.jira.web.FieldVisibilityManager;
-import com.atlassian.mail.MailUtils;
 import org.apache.log4j.Category;
 import org.apache.log4j.Logger;
 

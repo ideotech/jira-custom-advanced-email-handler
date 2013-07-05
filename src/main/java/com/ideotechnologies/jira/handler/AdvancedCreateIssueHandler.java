@@ -6,6 +6,7 @@ import com.atlassian.jira.bc.project.component.ProjectComponent;
 import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.config.ConstantsManager;
 import com.atlassian.jira.config.properties.ApplicationProperties;
+import com.atlassian.jira.event.type.EventType;
 import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.IssueFactory;
 import com.atlassian.jira.issue.IssueFieldConstants;
@@ -26,7 +27,6 @@ import com.atlassian.jira.security.Permissions;
 import com.atlassian.jira.service.util.handler.MessageHandlerErrorCollector;
 import com.atlassian.jira.user.UserUtils;
 import com.atlassian.jira.web.FieldVisibilityManager;
-import com.atlassian.mail.MailUtils;
 import com.google.common.collect.Lists;
 import com.opensymphony.util.TextUtils;
 import org.apache.log4j.Logger;
@@ -292,6 +292,8 @@ public class AdvancedCreateIssueHandler extends AbstractAdvancedEmailHandler {
 
             addCCUserToCustomField(message,issueObject);
             createAttachmentsForMessage(message, issue);
+
+            ComponentAccessor.getIssueEventManager().dispatchEvent(EventType.ISSUE_CREATED_ID,issue,reporter,true);
 
             return true;
         }
