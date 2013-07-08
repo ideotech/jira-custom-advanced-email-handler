@@ -28,21 +28,10 @@ public class HtmlToTextConverter
     private class HTMLCallbackHandler extends HTMLEditorKit.ParserCallback {
 
         Writer out;
-        boolean started = false;
-        boolean inBody = false;
-        boolean inList = false;
-        boolean firstTD = true;
-        int listCount = -1;
         ArrayList links = new ArrayList();
 
-        private static final String NEWLINE = "\n";
-        private static final String TAB = "\t";
-        private static final String STAR = "*";
-        private static final String SPACE = " ";
-        private static final String PERIOD = ".";
         private static final String OPEN_BRACKET = "[";
         private static final String CLOSE_BRACKET = "]";
-        private static final String DASH_LINE = "----------------------------------------------------------------------------------------";
 
         // Note: the "position" parameter for all the methods below denotes our
         // character position in the source document. Thus, we ignore it a lot.
@@ -53,74 +42,15 @@ public class HtmlToTextConverter
         public void handleStartTag(HTML.Tag tag, javax.swing.text.MutableAttributeSet set, int position) {
             try
             {
-                if (inBody && started && tag.equals(HTML.Tag.P))
-                {
-                    out.write(NEWLINE + NEWLINE);
-                }
-                else if (inBody && started && tag.equals(HTML.Tag.OL) || tag.equals(HTML.Tag.UL))
-                {
-                    inList = true;
-                    out.write(NEWLINE + NEWLINE);
-                    if(tag.equals(HTML.Tag.OL))
-                        listCount = 1;
-                }
-                else if (inBody && started && inList && tag.equals(HTML.Tag.LI))
-                {
-                    out.write(NEWLINE);
-                    if(listCount != -1)
+                // We don't handle images in body
+                if (!tag.equals(HTML.Tag.IMG))
                     {
-                        out.write(listCount + PERIOD + SPACE);
-                        listCount++;
+                        String setString="";
+                        if (set != null) {
+                            setString=" "+set.toString()+" " ;
+
+                        out.write("<"+tag.toString()+setString+">");                }
                     }
-                    else
-                        out.write(STAR);
-                }
-                else if (inBody && started && tag.equals(HTML.Tag.TABLE))
-                {
-                    out.write(NEWLINE);
-                }
-                else if (inBody && started && tag.equals(HTML.Tag.TR))
-                {
-                    out.write(NEWLINE);
-                    firstTD = true;
-                }
-                else if (inBody && started && tag.equals(HTML.Tag.TD) || tag.equals(HTML.Tag.TH))
-                {
-                    if(!firstTD)
-                    {
-                        out.write(TAB);
-                    }
-                    else
-                    {
-                        firstTD = false;
-                    }
-                }
-                else if (inBody && started && tag.equals(HTML.Tag.PRE))
-                {
-                    out.write(NEWLINE);
-                }
-                else if (inBody && started && tag.equals(HTML.Tag.IMG))
-                {
-                    // Check if the img has a src attribute
-                    handleLink((String)set.getAttribute(HTML.Attribute.SRC));
-                }
-                else if (inBody && started && tag.equals(HTML.Tag.A))
-                {
-                    // Check if the img has a src attribute
-                    handleLink((String)set.getAttribute(HTML.Attribute.HREF));
-                }
-                else if (inBody && started && tag.equals(HTML.Tag.HR))
-                {
-                    out.write(NEWLINE + DASH_LINE);
-                }
-                else if (inBody && started && tag.equals(HTML.Tag.H1) || tag.equals(HTML.Tag.H2) || tag.equals(HTML.Tag.H3) || tag.equals(HTML.Tag.H4) || tag.equals(HTML.Tag.H5) || tag.equals(HTML.Tag.H6))
-                {
-                    out.write(NEWLINE);
-                }
-                else if (tag.equals(HTML.Tag.BODY))
-                {
-                    inBody = true;
-                }
             }
             catch (IOException e)
             {
@@ -129,57 +59,21 @@ public class HtmlToTextConverter
 
         }
 
-        private void handleLink(String src) throws IOException
-        {
-            if(src != null)
-            {
-                links.add(src);
-                out.write(OPEN_BRACKET + links.size() + CLOSE_BRACKET);
-            }
-        }
 
         public void handleEndTag(HTML.Tag tag, int position) {
-            if (inBody && started && tag.equals(HTML.Tag.OL) || tag.equals(HTML.Tag.UL))
-            {
-                inList = false;
-                if(tag.equals(HTML.Tag.OL))
-                    listCount = -1;
-            }
-            else if (tag.equals(HTML.Tag.BODY))
-            {
-                if(links.size() != 0)
-                {
-                    // write out the links
-                    try
-                    {
-                        out.write(NEWLINE + DASH_LINE + NEWLINE);
-                        for (int i = 0; i < links.size(); i++)
-                        {
-                            String src = (String)links.get(i);
-                            out.write(OPEN_BRACKET + (i + 1) + CLOSE_BRACKET + SPACE + src);
-                            if((i + 1) < links.size())
-                            {
-                                out.write(NEWLINE);
-                            }
-                        }
-                    }
-                    catch (IOException e)
-                    {
-                        e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-                    }
-                }
-                inBody = false;
+
+            try {
+                out.write("</"+tag.toString()+">");
+            } catch (IOException e) {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             }
         }
 
         public void handleText(char[] aChar, int position) {
             try
             {
-                if (inBody)
-                {
-                    out.write(aChar);
-                    started = true;
-                }
+                out.write(aChar);
+
             }
             catch (IOException e)
             {
@@ -190,8 +84,13 @@ public class HtmlToTextConverter
         public void handleSimpleTag(HTML.Tag tag, javax.swing.text.MutableAttributeSet a, int pos) {
             try
             {
-                if (inBody && started && tag.equals(HTML.Tag.BR))
-                    out.write(NEWLINE);
+                String aString="";
+//                if (a != null) {
+//                    aString=" "+a.toString()+" " ;
+//
+//                out.write("<"+tag.toString()+" "+aString+"/>");
+//                }
+                out.write("<"+tag.toString()+"/>");
             }
             catch (IOException e)
             {

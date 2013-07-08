@@ -43,6 +43,7 @@ public class MailUtils
     static final int BUFFER_SIZE = 64 * 1024;
     static final String MULTIPART_ALTERNATE_CONTENT_TYPE = "multipart/alternative";
     static final String MULTIPART_RELATED_CONTENT_TYPE = "multipart/related";
+    static final String MULTIPART_MIXED_CONTENT_TYPE = "multipart/mixed";
     static final String TEXT_CONTENT_TYPE = "text/plain";
     static final String MESSAGE_CONTENT_TYPE = "message/rfc822";
     static final String HTML_CONTENT_TYPE = "text/html";
@@ -388,18 +389,47 @@ public class MailUtils
         if(multipartType != null && compareContentType(multipartType, MULTIPART_ALTERNATE_CONTENT_TYPE))
         {
             log.warn("We found an alternate Content Type");
-//            BodyPart part = getFirstInlinePartWithMimeType(multipart, TEXT_CONTENT_TYPE);
-            BodyPart part = getFirstInlinePartWithMimeType(multipart, HTML_CONTENT_TYPE);
-            if(part != null)
-            {
-                log.warn("We found an HTML Content Type inside");
-                appendMultipartText(extractTextFromPart(part), sb);
+
+//            BodyPart part = getFirstInlinePartWithMimeType(multipart, TEXT_CONTENT_TYPE)
+            BodyPart part = getFirstInlinePartWithMimeType(multipart, MULTIPART_RELATED_CONTENT_TYPE);
+
+            if (part != null && part.getContent() instanceof Multipart){
+                getBodyFromMultipart((Multipart)part.getContent(),sb);
+//                Multipart multipart1=(Multipart)part.getContent();
+//                part = getFirstInlinePartWithMimeType(multipart1, HTML_CONTENT_TYPE);
+
+//                if (part!= null)
+//                {
+//                    log.warn("We found an HTML Content Type inside");
+//                    appendMultipartText(extractTextFromPart(part), sb);
+//                }
+//                else
+//                {
+//                    part = getFirstInlinePartWithMimeType(multipart1, TEXT_CONTENT_TYPE);
+//                    appendMultipartText(extractTextFromPart(part), sb);
+//                }
             }
-            else
-            {
-//                part = getFirstInlinePartWithMimeType(multipart, HTML_CONTENT_TYPE);
-                part = getFirstInlinePartWithMimeType(multipart, TEXT_CONTENT_TYPE);
-                appendMultipartText(extractTextFromPart(part), sb);
+
+            else {
+                part = getFirstInlinePartWithMimeType(multipart, MULTIPART_MIXED_CONTENT_TYPE);
+                if (part != null && part.getContent() instanceof Multipart){
+                    getBodyFromMultipart((Multipart)part.getContent(),sb);
+                }
+                else {
+                    part = getFirstInlinePartWithMimeType(multipart, HTML_CONTENT_TYPE);
+
+                    if(part != null)
+                    {
+                        log.warn("We found an HTML Content Type inside");
+                        appendMultipartText(extractTextFromPart(part), sb);
+                    }
+                    else
+                    {
+//                    part = getFirstInlinePartWithMimeType(multipart, HTML_CONTENT_TYPE);
+                        part = getFirstInlinePartWithMimeType(multipart, TEXT_CONTENT_TYPE);
+                        appendMultipartText(extractTextFromPart(part), sb);
+                    }
+                }
             }
             return;
         }
@@ -467,8 +497,9 @@ public class MailUtils
         }
         else if (isPartHtml(part))
         {
-              content=(String)part.getContent();
-//            content = htmlConverter.convert((String) part.getContent());
+            content=(String)part.getContent();
+            content="{html}"+content+"{html}";
+
         }
 
         if (content == null)
