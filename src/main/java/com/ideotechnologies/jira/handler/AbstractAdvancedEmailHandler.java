@@ -26,6 +26,7 @@ import com.atlassian.jira.user.util.UserUtil;
 import com.atlassian.jira.util.dbc.Assertions;
 import com.atlassian.jira.web.FieldVisibilityManager;
 import com.atlassian.jira.web.util.FileNameCharacterCheckerUtil;
+import com.atlassian.mail.MailUtils;
 import com.opensymphony.util.TextUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -59,6 +60,7 @@ abstract class AbstractAdvancedEmailHandler implements MessageHandler {
     private String ccField="";
     /** Regex for JIRA email address. */
     String jiraEmail;
+    Boolean htmlFirst=false;
 
     Map params = new HashMap();
     private static final FileNameCharacterCheckerUtil fileNameCharacterCheckerUtil = new FileNameCharacterCheckerUtil();
@@ -146,6 +148,10 @@ abstract class AbstractAdvancedEmailHandler implements MessageHandler {
             if (!createUsers) {
                 log.debug(Settings.KEY_USERGROUP + " parameter is set, but " +  Settings.KEY_CREATEUSERS + " is set to FALSE");
             }
+        }
+
+        if (params.containsKey(Settings.KEY_HTMLFIRST)) {
+            htmlFirst = Boolean.valueOf((String)params.get(Settings.KEY_HTMLFIRST));
         }
 
         if (params.containsKey(Settings.KEY_FINGER_PRINT) && Settings.VALUES_FINGERPRINT.contains(params.get(Settings.KEY_FINGER_PRINT)))
@@ -1070,7 +1076,12 @@ abstract class AbstractAdvancedEmailHandler implements MessageHandler {
 
     String getEmailBody(Message message, Boolean registerSenderInCommentText) throws MessagingException
     {
-        String body = MailUtils.getBody(message);
+        String body ="";
+        if (htmlFirst==true)
+            body= HtmlMailUtils.getBody(message, true);
+        else
+            body=MailUtils.getBody(message);
+
         if (registerSenderInCommentText)
         {
             if ((message.getFrom() != null) && (message.getFrom().length > 0)) {

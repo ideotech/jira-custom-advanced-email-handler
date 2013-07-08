@@ -27,6 +27,7 @@ import com.atlassian.jira.security.Permissions;
 import com.atlassian.jira.service.util.handler.MessageHandlerErrorCollector;
 import com.atlassian.jira.user.UserUtils;
 import com.atlassian.jira.web.FieldVisibilityManager;
+import com.atlassian.mail.MailUtils;
 import com.google.common.collect.Lists;
 import com.opensymphony.util.TextUtils;
 import org.apache.log4j.Logger;
@@ -59,6 +60,7 @@ public class AdvancedCreateIssueHandler extends AbstractAdvancedEmailHandler {
     private boolean ccAssignee = true;        // first Cc user becomes the assignee ?
     private String excludeAddress;
 
+
     AdvancedCreateIssueHandler(CommentManager commentManager, IssueFactory issueFactory, ApplicationProperties applicationProperties, JiraApplicationContext jiraApplicationContext, AssigneeResolver assigneeResolver, FieldVisibilityManager fieldvisibilityManager, IssueUpdater issueUpdater) {
         super(commentManager, issueFactory, applicationProperties, jiraApplicationContext, assigneeResolver, fieldvisibilityManager,issueUpdater);
     }
@@ -90,6 +92,7 @@ public class AdvancedCreateIssueHandler extends AbstractAdvancedEmailHandler {
         {
             excludeAddress = params.get(Settings.KEY_EXCLUDEADDRESS);
         }
+
         log.debug("Params: " + this.defaultProjectKey + " - " + this.defaultIssueType + " - " + this.ccAssignee + " - " + this.defaultComponentName);
     }
 
@@ -353,7 +356,10 @@ public class AdvancedCreateIssueHandler extends AbstractAdvancedEmailHandler {
      * @throws MessagingException
      */
     private String getDescription(User reporter, Message message) throws MessagingException {
-        return recordFromAddressForAnon(reporter, message, MailUtils.getBody(message));
+        if (htmlFirst)
+            return recordFromAddressForAnon(reporter, message, HtmlMailUtils.getBody(message, htmlFirst));
+        else
+            return recordFromAddressForAnon(reporter, message, MailUtils.getBody(message));
     }
 
 

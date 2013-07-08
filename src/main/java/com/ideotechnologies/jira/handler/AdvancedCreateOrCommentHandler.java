@@ -35,6 +35,7 @@ import com.atlassian.jira.util.ImportUtils;
 import com.atlassian.jira.util.JiraUtils;
 import com.atlassian.jira.web.FieldVisibilityManager;
 import com.atlassian.jira.workflow.*;
+import com.atlassian.mail.MailUtils;
 import com.opensymphony.workflow.loader.ActionDescriptor;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
@@ -662,7 +663,11 @@ public class AdvancedCreateOrCommentHandler extends AbstractAdvancedEmailHandler
 
     String getStrippedEmailBody(Message message, Boolean registerSenderInCommentText) throws MessagingException
     {
-        String body = MailUtils.getBody(message);
+        String body="";
+        if (htmlFirst == true)
+            body = HtmlMailUtils.getBody(message, htmlFirst);
+        else
+            body = MailUtils.getBody(message);
         if (registerSenderInCommentText) {
             body = body + "\n[Commented via e-mail ";
             if ((message.getFrom() != null) && (message.getFrom().length > 0))

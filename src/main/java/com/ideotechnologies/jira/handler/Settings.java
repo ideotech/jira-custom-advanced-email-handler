@@ -62,4 +62,6 @@ public class Settings
     public static final String KEY_CCFIELD="ccField";
     public static final String KEY_EXCLUDEADDRESS="excludeaddress";
     public static final String KEY_REFERENCEATTACHMENTS="referenceattachments";
+    public static final String KEY_HTMLFIRST = "htmlfirst";
+
 }
