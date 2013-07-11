@@ -1,7 +1,7 @@
 <atlassian-plugin key="com.ideotechnologies.jira.jira-custom-advanced-email-handler" name="Advanced Email Handler for JIRA by Ideo Technologies" plugins-version="2">
     <plugin-info>
         <description>This is the advanced email handler plugin for Atlassian JIRA by Ideo Technologies.</description>
-        <version>1.2.2</version>
+        <version>1.2.3-SNAPSHOT</version>
         <vendor name="Ideo Technologies" url="http://www.ideotechnologies.com/" />
         <param name="plugin-icon">images/pluginIcon.png</param>
         <param name="plugin-logo">images/pluginLogo.png</param>

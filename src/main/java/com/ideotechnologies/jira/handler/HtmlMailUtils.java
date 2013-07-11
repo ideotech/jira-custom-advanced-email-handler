@@ -72,7 +72,7 @@ public class HtmlMailUtils
         log.warn("getBody(message)");
         try
         {
-            String content = extractTextFromPart(message);
+            String content = extractTextFromPart(message,htmlFirst);
 
             if (content == null)
             {
@@ -151,12 +151,12 @@ public class HtmlMailUtils
 
                     if(part != null)
                     {
-                        appendMultipartText(extractTextFromPart(part), sb);
+                        appendMultipartText(extractTextFromPart(part,htmlFirst), sb);
                     }
                     else
                     {
                         part = getFirstInlinePartWithMimeType(multipart, secondPartType);
-                        appendMultipartText(extractTextFromPart(part), sb);
+                        appendMultipartText(extractTextFromPart(part,htmlFirst), sb);
                     }
                 }
             }
@@ -173,7 +173,7 @@ public class HtmlMailUtils
             {
                 try
                 {
-                    String content = extractTextFromPart(part);
+                    String content = extractTextFromPart(part,htmlFirst);
                     if (content != null)
                     {
                         appendMultipartText(content, sb);
@@ -202,7 +202,7 @@ public class HtmlMailUtils
         }
     }
 
-    private static String extractTextFromPart(Part part) throws IOException, MessagingException,
+    private static String extractTextFromPart(Part part, Boolean htmlFormat) throws IOException, MessagingException,
             UnsupportedEncodingException
     {
         if (part == null)
@@ -215,6 +215,9 @@ public class HtmlMailUtils
             try
             {
                 content = (String) part.getContent();
+                if (htmlFormat) {
+                    content="{noformat}"+content+"{noformat}";
+                }
             }
             catch (UnsupportedEncodingException e)
             {
@@ -222,6 +225,9 @@ public class HtmlMailUtils
                 log.warn("Found unsupported encoding '" + e.getMessage() + "'. Reading content with "
                         + DEFAULT_ENCODING + " encoding.");
                 content = getBody(part, DEFAULT_ENCODING);
+                if (htmlFormat) {
+                    content="{noformat}"+content+"{noformat}";
+                }
             }
         }
         else if (MailUtils.isPartHtml(part))
