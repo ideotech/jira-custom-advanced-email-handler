@@ -214,6 +214,9 @@ public class AdvancedCreateOrCommentHandler extends AbstractAdvancedEmailHandler
             issue = ComponentAccessor.getMailThreadManager().getAssociatedIssueObject(message);
         }
 
+        if (issue!=null && forceProject==true && !issue.getProjectObject().getKey().equals(defaultProjectKey))
+            issue=null;
+
         // Store the FROM address for later (if there's no FROM, we discard the
         // message !)
         Address[] from = message.getFrom();

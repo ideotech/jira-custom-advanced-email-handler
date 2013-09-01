@@ -102,7 +102,7 @@
     <properties>
         <jira.version>5.2.9</jira.version>
         <jira.mail.plugin.version>5.2.22</jira.mail.plugin.version>
-        <amps.version>4.2.3</amps.version>
+        <amps.version>4.2.7</amps.version>
         <plugin.testrunner.version>1.1.1</plugin.testrunner.version>
     </properties>
 </project>

@@ -61,6 +61,7 @@ abstract class AbstractAdvancedEmailHandler implements MessageHandler {
     /** Regex for JIRA email address. */
     String jiraEmail;
     Boolean htmlFirst=false;
+    Boolean forceProject=false;
 
     Map params = new HashMap();
     private static final FileNameCharacterCheckerUtil fileNameCharacterCheckerUtil = new FileNameCharacterCheckerUtil();
@@ -152,6 +153,10 @@ abstract class AbstractAdvancedEmailHandler implements MessageHandler {
 
         if (params.containsKey(Settings.KEY_HTMLFIRST)) {
             htmlFirst = Boolean.valueOf((String)params.get(Settings.KEY_HTMLFIRST));
+        }
+
+        if (params.containsKey(Settings.KEY_FORCEPROJECT)) {
+            forceProject = Boolean.valueOf((String)params.get(Settings.KEY_FORCEPROJECT));
         }
 
         if (params.containsKey(Settings.KEY_FINGER_PRINT) && Settings.VALUES_FINGERPRINT.contains(params.get(Settings.KEY_FINGER_PRINT)))
