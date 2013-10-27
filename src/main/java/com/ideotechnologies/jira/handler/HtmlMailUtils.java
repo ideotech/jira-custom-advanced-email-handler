@@ -79,7 +79,7 @@ public class HtmlMailUtils
                 log.warn("content is null");
                 if (message.getContent() instanceof Multipart)
                 {
-                    log.warn("calling getBodyFromMultipart");
+                    log.debug("calling getBodyFromMultipart");
                     content = getBodyFromMultipart((Multipart) message.getContent(),htmlFirst);
                 }
             }
@@ -114,7 +114,7 @@ public class HtmlMailUtils
     private static void getBodyFromMultipart(Multipart multipart, StringBuffer sb, Boolean htmlFirst) throws MessagingException, IOException
     {
         String multipartType = multipart.getContentType();
-        log.warn("getBodyFromMultipart");
+        log.debug("getBodyFromMultipart");
 
         // if an multipart/alternative type we just get the first text or html content found
         if(multipartType != null && compareContentType(multipartType, MULTIPART_ALTERNATE_CONTENT_TYPE))
