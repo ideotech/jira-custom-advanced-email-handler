@@ -111,6 +111,10 @@ public class AdvancedCreateOrCommentHandler extends AbstractAdvancedEmailHandler
 
         super.init(params);
 
+        if (params.containsKey(Settings.KEY_FSPACK))  {
+            stripQuotes=true;
+        }
+
         if (params.containsKey(Settings.KEY_PROJECT)) {
             this.defaultProjectKey = params.get(Settings.KEY_PROJECT);
         }

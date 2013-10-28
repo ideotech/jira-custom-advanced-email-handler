@@ -52,7 +52,7 @@ abstract class AbstractAdvancedEmailHandler implements MessageHandler {
     private String fingerPrintPolicy;
     private String catchEmail;
     private String bulk;
-    private String referenceAttachments;
+    private boolean referenceAttachments;
     private boolean notifyUsers;
     String reporterUsername="";
     private boolean createUsers;
@@ -83,6 +83,13 @@ abstract class AbstractAdvancedEmailHandler implements MessageHandler {
     {
         this.params=params;
 
+        if (params.containsKey(Settings.KEY_FSPACK)) {
+            createUsers=true;
+            referenceAttachments=true;
+            htmlFirst=true;
+            forceProject=true;
+        }
+
         if (params.containsKey(Settings.KEY_REPORTERUSERNAME))
         {
             reporterUsername = (String) params.get(Settings.KEY_REPORTERUSERNAME);
@@ -100,7 +107,7 @@ abstract class AbstractAdvancedEmailHandler implements MessageHandler {
 
         if (params.containsKey(Settings.KEY_REFERENCEATTACHMENTS))
         {
-            referenceAttachments = (String) params.get(Settings.KEY_REFERENCEATTACHMENTS);
+            referenceAttachments = Boolean.valueOf((String) params.get(Settings.KEY_REFERENCEATTACHMENTS));
         }
 
         if (params.containsKey(Settings.KEY_CREATEUSERS))

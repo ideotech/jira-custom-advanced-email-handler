@@ -64,5 +64,6 @@ public class Settings
     public static final String KEY_REFERENCEATTACHMENTS="referenceattachments";
     public static final String KEY_HTMLFIRST = "htmlfirst";
     public static final String KEY_FORCEPROJECT = "forceproject";
+    public static final String KEY_FSPACK = "fspack";
 
 }
