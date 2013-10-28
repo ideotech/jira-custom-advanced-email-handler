@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.ideotechnologies.jira</groupId>
     <artifactId>jira-custom-advanced-email-handler</artifactId>
-    <version>1.2.4</version>
+    <version>2.0</version>
     <organization>
         <name>Ideo Technologies</name>
         <url>http://www.ideotechnologies.com/</url>
@@ -29,7 +29,13 @@
         </dependency-->
         <dependency>
             <groupId>com.atlassian.jira</groupId>
-            <artifactId>atlassian-jira</artifactId>
+            <artifactId>jira-api</artifactId>
+            <version>${jira.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.atlassian.jira</groupId>
+            <artifactId>jira-core</artifactId>
             <version>${jira.version}</version>
             <scope>provided</scope>
         </dependency>
@@ -100,8 +106,8 @@
         </plugins>
     </build>
     <properties>
-        <jira.version>5.2.9</jira.version>
-        <jira.mail.plugin.version>5.2.22</jira.mail.plugin.version>
+        <jira.version>6.1</jira.version>
+        <jira.mail.plugin.version>6.1.17</jira.mail.plugin.version>
         <amps.version>4.2.7</amps.version>
         <plugin.testrunner.version>1.1.1</plugin.testrunner.version>
     </properties>
