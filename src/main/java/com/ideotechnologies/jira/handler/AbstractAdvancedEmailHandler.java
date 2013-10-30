@@ -84,10 +84,12 @@ abstract class AbstractAdvancedEmailHandler implements MessageHandler {
         this.params=params;
 
         if (params.containsKey(Settings.KEY_FSPACK)) {
+            if (Boolean.valueOf((String)params.get(Settings.KEY_FSPACK))){
             createUsers=true;
             referenceAttachments=true;
             htmlFirst=true;
             forceProject=true;
+            }
         }
 
         if (params.containsKey(Settings.KEY_REPORTERUSERNAME))

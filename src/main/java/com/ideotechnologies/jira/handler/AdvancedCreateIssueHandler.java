@@ -73,7 +73,8 @@ public class AdvancedCreateIssueHandler extends AbstractAdvancedEmailHandler {
         super.init(params);
 
         if (params.containsKey(Settings.KEY_FSPACK))  {
-            ccAssignee=false;
+            if (Boolean.valueOf(params.get(Settings.KEY_FSPACK)))
+               ccAssignee=false;
         }
 
         if (params.containsKey(Settings.KEY_PROJECT)) {
