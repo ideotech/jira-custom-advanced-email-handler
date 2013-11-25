@@ -214,7 +214,9 @@ public class AdvancedCreateIssueHandler extends AbstractAdvancedEmailHandler {
                 assignee = getUserByName(assigneeName);
             } else {
                 if (ccAssignee) {
-                    assignee = getFirstValidAssignee(message.getAllRecipients(), project);
+//                    assignee = getFirstValidAssignee(message.getAllRecipients(), project);
+                    assignee= getFirstValidAssignee(MessageParser.getCleanMailAddresses(message),project);
+
                 }
             }
             if (assignee == null) {

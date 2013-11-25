@@ -338,7 +338,8 @@ abstract class AbstractAdvancedEmailHandler implements MessageHandler {
         final Address[] addresses;
         try
         {
-            addresses = message.getAllRecipients();
+//          addresses = message.getAllRecipients();
+            addresses = MessageParser.getCleanMailAddresses(message);
         }
         catch (final MessagingException e)
         {
@@ -1127,32 +1128,37 @@ abstract class AbstractAdvancedEmailHandler implements MessageHandler {
                 }
             }
 
-            //Address[] addresses = message.getRecipients(Message.RecipientType.CC);
-            // Address[] addresses=new Address[0];
-
-            //Address[] addresses=new Address[message.getRecipients(Message.RecipientType.CC).length+message.getRecipients(Message.RecipientType.TO).length];
-
             List<Address> addressList = new ArrayList<Address>();
 
-            if (message.getRecipients(Message.RecipientType.TO)!= null){
-               for (Address address : message.getRecipients(Message.RecipientType.TO)){
-                  addressList.add(address);
+            if (message.getHeader(String.valueOf(Message.RecipientType.TO)) != null) {
+               List<String> toAddresses = MessageParser.getAllEmailsFromString(message.getHeader(String.valueOf(Message.RecipientType.TO))[0]);
+               if (toAddresses !=null) {
+                   for (String toAddress:toAddresses) {
+                       if (MessageParser.isEmailValid(toAddress))
+                           addressList.add(new InternetAddress(toAddress));
+                   }
                }
             }
-            if (message.getRecipients(Message.RecipientType.CC)!= null)
-               for (Address address : message.getRecipients(Message.RecipientType.CC)){
-                   addressList.add(address);
+
+            if (message.getHeader(String.valueOf(Message.RecipientType.CC)) != null) {
+               List<String>ccAddresses = MessageParser.getAllEmailsFromString(message.getHeader(String.valueOf(Message.RecipientType.CC))[0]);
+               if (ccAddresses !=null) {
+                   for (String ccAddress:ccAddresses) {
+                       if (MessageParser.isEmailValid(ccAddress))
+                           addressList.add(new InternetAddress(ccAddress));
+                   }
                }
-            if (message.getRecipients(Message.RecipientType.BCC)!= null)
-                for (Address address : message.getRecipients(Message.RecipientType.BCC)){
-                    addressList.add(address);
-                }
+            }
 
-            //System.arraycopy(message.getRecipients(Message.RecipientType.CC),0,addresses,0,message.getRecipients(Message.RecipientType.CC).length);
-            //System.arraycopy(message.getRecipients(Message.RecipientType.TO),0,addresses,addresses.length,message.getRecipients(Message.RecipientType.TO).length);
-
-            //Address[] addresses= (Address[]) addressList.toArray();
-            //addressList.toArray(addresses);
+            if (message.getHeader(String.valueOf(Message.RecipientType.BCC)) != null) {
+               List<String> bccAddresses = MessageParser.getAllEmailsFromString(message.getHeader(String.valueOf(Message.RecipientType.BCC))[0]);
+               if (bccAddresses !=null) {
+                   for (String bccAddress:bccAddresses) {
+                       if (MessageParser.isEmailValid(bccAddress))
+                           addressList.add(new InternetAddress(bccAddress));
+                   }
+               }
+            }
 
             if (addressList != null) {
                 for (Address address : addressList) {

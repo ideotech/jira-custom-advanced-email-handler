@@ -12,10 +12,13 @@ import org.apache.log4j.Logger;
 import javax.mail.Address;
 import javax.mail.Message;
 import javax.mail.MessagingException;
+import javax.mail.internet.InternetAddress;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -208,7 +211,9 @@ class MessageParser {
      * @throws MessagingException  if there were problems handling the message
      */
     private static String getRecipientFromMessage(final String recipientRegExp, final Message message) throws MessagingException {
-        Address[] addresses = message.getAllRecipients();
+//        Address[] addresses = message.getAllRecipients();
+
+        Address[] addresses = getCleanMailAddresses(message);
         for (int i = 0; i < addresses.length; i++) {
             log.debug("Parsing message address " + i + ": " + addresses[i]);
             Pattern p = Pattern.compile(recipientRegExp, Pattern.CASE_INSENSITIVE);
@@ -264,5 +269,80 @@ class MessageParser {
     }
 
 
+    public static Address[] getCleanMailAddresses(Message message) throws MessagingException {
+
+        List<Address> listAddresses = new ArrayList<Address>();
+        if (message.getHeader(String.valueOf(Message.RecipientType.TO)) != null) {
+           List<String> toAddresses = getAllEmailsFromString(message.getHeader(String.valueOf(Message.RecipientType.TO))[0]);
+           if (toAddresses !=null) {
+              for (String toAddress:toAddresses) {
+                  if (isEmailValid(toAddress))
+                      listAddresses.add(new InternetAddress(toAddress));
+              }
+           }
+        }
+
+        // String ccAddresses[] = message.getHeader(String.valueOf(Message.RecipientType.CC));
+        if (message.getHeader(String.valueOf(Message.RecipientType.CC)) != null) {
+           List<String> ccAddresses = getAllEmailsFromString(message.getHeader(String.valueOf(Message.RecipientType.CC))[0]);
+           if (ccAddresses != null) {
+                 for (String ccAddress:ccAddresses) {
+                  if (isEmailValid(ccAddress))
+                      listAddresses.add(new InternetAddress(ccAddress));
+              }
+           }
+        }
+
+        // String bccAddresses[] = message.getHeader(String.valueOf(Message.RecipientType.BCC));
+        if (message.getHeader(String.valueOf(Message.RecipientType.BCC)) != null) {
+           List<String> bccAddresses = getAllEmailsFromString(message.getHeader(String.valueOf(Message.RecipientType.BCC))[0]);
+              if (bccAddresses != null) {
+              for (String bccAddress:bccAddresses) {
+                  listAddresses.add(new InternetAddress(bccAddress));
+              }
+           }
+        }
+
+        Address[] returnAddresses = new Address[ listAddresses.size() ];
+        listAddresses.toArray(returnAddresses);
+
+        return returnAddresses;
+
+    }
+
+
+    static Boolean isEmailValid(String address) {
+        Pattern pattern;
+        Matcher matcher;
+        final String EMAIL_PATTERN =
+                "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
+        pattern = Pattern.compile(EMAIL_PATTERN);
+        matcher = pattern.matcher(address);
+        return matcher.matches();
+    }
+
+    public static List<String> getAllEmailsFromString(String emailsList)
+    {
+        final String EMAIL_PATTERN = "[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@"
+                + "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})";
+
+        List<String> result = null;
+
+        if (emailsList != null) {
+           Matcher m =  Pattern.compile(EMAIL_PATTERN).matcher(emailsList);
+
+           if (m.find())
+           {
+               result = new ArrayList<String>();
+               result.add(m.group());
+
+               while(m.find())
+               {
+                   result.add(m.group());
+               }
+           }
+        }
+        return result;
+    }
 }
 
