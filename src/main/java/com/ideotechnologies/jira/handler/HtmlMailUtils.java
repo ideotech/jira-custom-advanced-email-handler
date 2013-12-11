@@ -90,7 +90,8 @@ public class HtmlMailUtils
                 log.info("Could not find any body to extract from the message");
             }
 
-            return content;
+
+            return removeNonPrintableCharacters(content);
         }
         catch (ClassCastException cce)
         {
@@ -282,6 +283,15 @@ public class HtmlMailUtils
     private static boolean compareContentType(String contentType, String mimeType)
     {
         return contentType.toLowerCase().startsWith(mimeType);
+    }
+
+    private static String removeNonPrintableCharacters( String content) {
+
+        // Remove all UTF-8 unsupported characters
+
+        String replacedContent=content.replaceAll("\\P{Print}", "");
+        return replacedContent;
+
     }
 
 
