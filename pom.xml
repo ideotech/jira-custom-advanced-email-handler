@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.ideotechnologies.jira</groupId>
     <artifactId>jira-custom-advanced-email-handler</artifactId>
-    <version>1.2.6</version>
+    <version>1.2.7</version>
     <organization>
         <name>Ideo Technologies</name>
         <url>http://www.ideotechnologies.com/</url>

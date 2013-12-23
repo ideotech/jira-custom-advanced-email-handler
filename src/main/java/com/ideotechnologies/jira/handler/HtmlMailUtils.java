@@ -14,6 +14,8 @@ import org.apache.log4j.Logger;
 
 import javax.mail.*;
 import java.io.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 // TODO: Doesn't handle charsets/encoding very well. Or, indeed, at all.
 /**
@@ -91,7 +93,7 @@ public class HtmlMailUtils
             }
 
 
-            return removeNonPrintableCharacters(content);
+            return content;
         }
         catch (ClassCastException cce)
         {
@@ -284,15 +286,5 @@ public class HtmlMailUtils
     {
         return contentType.toLowerCase().startsWith(mimeType);
     }
-
-    private static String removeNonPrintableCharacters( String content) {
-
-        // Remove all UTF-8 unsupported characters
-
-        String replacedContent=content.replaceAll("\\P{Print}", "");
-        return replacedContent;
-
-    }
-
 
 }
